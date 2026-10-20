@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kana Arcade</title>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Maru+Gothic:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#171233;--bg2:#2a1f5e;--ink:#f4f0ff;--pink:#ff3d81;--cyan:#2de2e6;--yel:#ffd23f;--ok:#43e08a;--bad:#ff5c5c;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0,var(--bg2),var(--bg) 70%) fixed;color:var(--ink);font-family:'DotGothic16','Zen Maru Gothic',system-ui,sans-serif}
+#app{max-width:560px;margin:0 auto;padding:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.mq{text-align:center;padding:18px 8px 8px}
+.mq h1{margin:0;font-size:clamp(40px,12vw,64px);letter-spacing:2px;color:var(--pink);text-shadow:0 0 18px #ff3d8199,3px 3px 0 #000}
+.mq h1 span{color:var(--cyan);text-shadow:0 0 18px #2de2e699,3px 3px 0 #000;margin-left:.2em}
+.mq p{margin:6px 0 0;opacity:.85}
+.seg{display:flex;gap:8px;margin:18px 0}
+.seg button{flex:1;padding:10px;border:3px solid var(--cyan);background:transparent;border-radius:4px}
+.seg button.on{background:var(--cyan);color:#10102a}
+.games{display:grid;gap:12px}
+.cab{display:grid;grid-template-columns:56px 1fr;grid-template-rows:auto auto auto;column-gap:12px;text-align:left;padding:14px;background:#0e0a24;border:3px solid var(--pink);border-radius:6px;box-shadow:0 5px 0 #8a1e47;transition:transform .08s}
+.cab:active{transform:translateY(4px);box-shadow:0 1px 0 #8a1e47}
+.cab i{grid-row:1/4;font-size:40px;font-style:normal;align-self:center;text-align:center}
+.cab b{font-size:21px;color:var(--yel)}
+.cab small{opacity:.85;font-size:14px}
+.cab em{font-style:normal;color:var(--cyan);font-size:14px;margin-top:4px}
+.snd{display:block;margin:18px auto 0;background:none;border:0;opacity:.8;padding:8px}
+.tip{text-align:center;font-size:13px;opacity:.7;margin:14px 0 0}
+.hud{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-size:22px}
+.hud b{color:var(--yel);font-size:28px}
+.bk{border:3px solid var(--cyan);background:none;border-radius:4px;padding:4px 12px}
+.btn{padding:14px 8px;font-size:24px;background:#0e0a24;border:3px solid var(--cyan);border-radius:6px;box-shadow:0 4px 0 #137a7e;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #137a7e}
+.btn.alt{border-color:var(--pink);box-shadow:0 4px 0 #8a1e47}
+.btn.ok{background:var(--ok);color:#06240f;border-color:var(--ok)}
+.btn.no{background:var(--bad);color:#2a0606;border-color:var(--bad)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.field{position:relative;height:min(52vh,420px);min-height:280px;overflow:hidden;border:3px solid var(--cyan);border-radius:6px;background:repeating-linear-gradient(0deg,#ffffff08 0 2px,transparent 2px 6px),#0b0820}
+.k{position:absolute;top:0;left:0;width:96px;height:56px;display:grid;place-items:center;font:700 40px 'Zen Maru Gothic',sans-serif;color:var(--ink)}
+.k.t{color:var(--yel);text-shadow:0 0 14px var(--yel)}
+.k.pop{animation:pop .3s forwards}
+@keyframes pop{to{opacity:0;scale:2}}
+.shake{animation:sk .25s}
+@keyframes sk{25%{translate:-6px}75%{translate:6px}}
+.bar{height:12px;border:2px solid var(--cyan);border-radius:3px;margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--pink);transition:width 1s linear}
+.card{display:grid;place-items:center;height:200px;font:700 min(34vw,140px) 'Zen Maru Gothic',sans-serif;background:#0b0820;border:3px solid var(--pink);border-radius:6px;transition:background .15s}
+.card.good{background:#14402a}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mc{aspect-ratio:1;border:3px solid var(--cyan);border-radius:6px;background:#2a1f5e;font:700 36px 'Zen Maru Gothic',sans-serif;padding:0}
+.mc span{opacity:0}
+.mc.up{background:#0b0820}.mc.up span{opacity:1}
+.mc.kn.up{border-color:var(--yel)}
+.mc.done{background:#14402a;border-color:var(--ok)}.mc.done span{opacity:1}
+.hint{text-align:center;opacity:.7;font-size:14px}
+.end{text-align:center;padding-top:20px}
+.end h2{font-size:32px;color:var(--yel);margin:0}
+.big{font-size:80px;color:var(--pink);text-shadow:0 0 20px #ff3d8199}
+.rev{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.rev span{border:2px solid var(--cyan);border-radius:4px;padding:4px 10px}
+.rev b{font:700 24px 'Zen Maru Gothic',sans-serif;color:var(--yel)}
+.row{display:flex;gap:12px;justify-content:center}
+.seg.lv{margin-top:-6px}.seg.lv button{border-color:var(--yel);font-size:14px}.seg.lv button.on{background:var(--yel);color:#10102a}
+.card.w{font-size:min(15vw,64px);text-align:center;padding:0 8px}
+.inp{width:100%;margin-top:14px;padding:14px;font:inherit;font-size:26px;text-align:center;color:var(--ink);background:#0b0820;border:3px solid var(--cyan);border-radius:6px}
+.inp:focus{outline:3px solid var(--yel)}
+.kg{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:8px;margin:12px 0}
+.kg i{display:block}
+.kc{aspect-ratio:var(--ar);display:grid;place-items:center;align-content:center;padding:2px;background:#0b0820;border:3px solid var(--cyan);border-radius:6px}
+.kc b{font:700 clamp(22px,7vw,34px) 'Zen Maru Gothic',sans-serif}
+.kc small{font-size:13px;color:var(--yel)}
+.kc.hid small{visibility:hidden}
+.card.s{font-size:min(9vw,42px);text-align:center;padding:0 10px;line-height:1.35}
+.sc{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;padding:12px;margin-bottom:10px;background:#0e0a24;border:3px solid var(--c);border-radius:6px}
+.sc>b{font:700 30px 'Zen Maru Gothic',sans-serif;color:var(--c);text-align:center}
+.sc small{display:block;opacity:.9;font-size:13px;line-height:1.6;margin-top:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const H='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+const R='a i u e o ka ki ku ke ko sa shi su se so ta chi tsu te to na ni nu ne no ha hi fu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo n'.split(' ');
+const K=[...H].map(c=>String.fromCharCode(c.charCodeAt(0)+96));
+const $=document.getElementById('app'),Q=s=>$.querySelector(s);
+let mode='h',L={b:1,d:0,y:0},cleanup=null,snd=true,S={best:{},miss:{}};
+try{S=Object.assign(S,JSON.parse(localStorage.getItem('kana-arcade')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('kana-arcade',JSON.stringify(S))}catch(e){}};
+const MS={h:'Hiragana',k:'Katakana',hk:'Ambos'};
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let AC;const beep=(f,d=.1,ty='square')=>{if(!snd)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.type=ty;o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}};
+const cv=s=>[...s].map(c=>String.fromCharCode(c.charCodeAt(0)+96)).join('');
+const zip=(a,b)=>{b=b.split(' ');return a.split(' ').map((h,i)=>[h,b[i]])};
+const D={b:[...H].map((c,i)=>[c,R[i]]),
+d:zip('が ぎ ぐ げ ご ざ じ ず ぜ ぞ だ ぢ づ で ど ば び ぶ べ ぼ ぱ ぴ ぷ ぺ ぽ','ga gi gu ge go za ji zu ze zo da ji zu de do ba bi bu be bo pa pi pu pe po'),
+y:zip('きゃ きゅ きょ しゃ しゅ しょ ちゃ ちゅ ちょ にゃ にゅ にょ ひゃ ひゅ ひょ みゃ みゅ みょ りゃ りゅ りょ ぎゃ ぎゅ ぎょ じゃ じゅ じょ びゃ びゅ びょ ぴゃ ぴゅ ぴょ','kya kyu kyo sha shu sho cha chu cho nya nyu nyo hya hyu hyo mya myu myo rya ryu ryo gya gyu gyo ja ju jo bya byu byo pya pyu pyo')};
+const lk=()=>Object.keys(L).filter(l=>L[l]).join('');
+const pool=()=>{const p=[];for(const l in L)if(L[l])for(const [h,r] of D[l]){if(mode!='k')p.push({c:h,r});if(mode!='h')p.push({c:cv(h),r})}return p};
+const w=k=>1+(S.miss[k.c]||0)*2;
+function pick(){const p=pool();let x=Math.random()*p.reduce((s,k)=>s+w(k),0);for(const k of p){x-=w(k);if(x<=0)return k}return p[0]}
+function opts(k){const rs=new Set([k.r]),p=pool();while(rs.size<4)rs.add(p[Math.random()*p.length|0].r);return sh([...rs])}
+const fail=k=>{S.miss[k.c]=(S.miss[k.c]||0)+1};
+const hud='<div class="hud"><button class="bk" id="bk" aria-label="Volver">◀</button><b id="sc">0</b><span id="lv"></span></div>';
+const optsHtml=k=>opts(k).map(r=>`<button class="btn" data-r="${r}">${r}</button>`).join('');
+
+function menu(){
+  cleanup&&cleanup();cleanup=null;
+  const g=[['chart','📚','Tabla de kana','Memoriza los kana antes de jugar. Toca para escucharlos.'],['rain','🌧️','Lluvia de kana','Destruye los kana antes de que toquen el suelo.'],['blitz','⚡','Relámpago','60 segundos. Más combo, más puntos.'],['mem','🃏','Memoria','Une cada kana con su sonido.'],['type','⌨️','Escritura','Escribe el romaji de cada kana.'],['words','📖','Palabras','Lee palabras reales y adivina qué significan.'],['sailor','🌙','Sailor Scouts','Aprende sus nombres y qué significan.']];
+  $.innerHTML=`<header class="mq"><h1>かな<span>アーケード</span></h1><p>Aprende hiragana y katakana jugando</p></header>
+  <div class="seg">${Object.keys(MS).map(m=>`<button class="${m==mode?'on':''}" data-m="${m}">${MS[m]}</button>`).join('')}</div>
+  <div class="seg lv">${[['b','Básicos'],['d','Dakuten'],['y','Combinaciones']].map(([l,t])=>`<button class="${L[l]?'on':''}" data-l="${l}">${t}</button>`).join('')}</div>
+  <div class="games">${g.map(x=>`<button class="cab" data-g="${x[0]}"><i>${x[1]}</i><b>${x[2]}</b><small>${x[3]}</small>${x[0]=='chart'?'':`<em>Récord: ${S.best[rk(x[0]=='sailor'?'squiz':x[0])]||0}</em>`}</button>`).join('')}</div>
+  <p class="tip">Los kana que más fallas aparecen más seguido.</p>
+  <button class="snd" id="sn">${snd?'🔊 Sonido':'🔇 Sin sonido'}</button>`;
+  $.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mode=b.dataset.m;menu()});
+  $.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>play(b.dataset.g));
+  $.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{const l=b.dataset.l;L[l]=L[l]?0:1;if(!L.b&&!L.d&&!L.y)L[l]=1;menu()});
+  Q('#sn').onclick=()=>{snd=!snd;menu();beep(700)};
+}
+const GAMES={};
+function play(g){cleanup&&cleanup();cleanup=null;GAMES[g]();const b=Q('#bk');if(b&&!b.onclick)b.onclick=menu}
+
+function end(g,score,wrong,extra){
+  cleanup&&cleanup();cleanup=null;save();
+  const key=rk(g),nb=score>(S.best[key]||0);if(nb)S.best[key]=score;save();beep(nb?880:330,.3);
+  const u=[...new Map(wrong.map(x=>[x.c,x])).values()].slice(0,12);
+  $.innerHTML=`<div class="end"><h2>${nb?'¡Nuevo récord!':'Fin de partida'}</h2><div class="big">${score}</div><p>${extra}</p>
+  ${u.length?`<h3>Para repasar</h3><div class="rev">${u.map(x=>`<span><b>${x.c}</b> ${x.r}</span>`).join('')}</div>`:'<p>Sin errores. ¡Perfecto! 🎉</p>'}
+  <div class="row"><button class="btn" id="again">Otra vez</button><button class="btn alt" id="home">Menú</button></div></div>`;
+  Q('#again').onclick=()=>play(g);Q('#home').onclick=menu;
+}
+
+GAMES.rain=function(){
+  let score=0,lives=3,combo=0,hit=0,fl=[],last=performance.now(),sp=0,run=true,tgt=null,wrong=[],n=0;
+  $.innerHTML=hud+'<div class="field" id="f"></div><div class="opts" id="o"></div>';
+  const f=Q('#f'),o=Q('#o');
+  const up=()=>{Q('#sc').textContent=score;Q('#lv').textContent='❤'.repeat(lives)+(combo>1?'  x'+combo:'')};
+  const setT=()=>{
+    const t=fl.reduce((a,b)=>!a||b.y>a.y?b:a,null);if(t===tgt)return;
+    tgt&&tgt.el.classList.remove('t');tgt=t;
+    if(!t){o.innerHTML='';return}
+    t.el.classList.add('t');o.innerHTML=optsHtml(t.k);
+    o.querySelectorAll('button').forEach(b=>b.onclick=()=>ans(b.dataset.r));
+  };
+  const add=()=>{const k=pick(),el=document.createElement('div');el.className='k';el.textContent=k.c;el.style.left=Math.random()*(f.clientWidth-96)+'px';f.appendChild(el);fl.push({el,k,y:-60,v:40+Math.min(80,n*3)});n++;setT()};
+  const ans=r=>{
+    if(!tgt)return;const t=tgt;
+    if(r===t.k.r){combo++;hit++;score+=10+Math.min(combo,10)*2;beep(660+combo*30,.08);fl=fl.filter(x=>x!==t);t.el.classList.add('pop');setTimeout(()=>t.el.remove(),300);tgt=null;setT()}
+    else{combo=0;fail(t.k);wrong.push(t.k);beep(160,.2,'sawtooth');o.classList.remove('shake');void o.offsetWidth;o.classList.add('shake')}
+    up();
+  };
+  const loop=now=>{
+    if(!run)return;
+    const dt=Math.min(.05,(now-last)/1000);last=now;sp-=dt;
+    if(sp<=0){add();sp=Math.max(1.2,2.8-score/300)}
+    const h=f.clientHeight;
+    for(const x of [...fl]){
+      x.y+=x.v*dt;x.el.style.transform=`translateY(${x.y}px)`;
+      if(x.y>h-56){
+        fl=fl.filter(z=>z!==x);x.el.remove();lives--;combo=0;fail(x.k);wrong.push(x.k);beep(120,.3,'sawtooth');
+        if(x===tgt)tgt=null;setT();up();
+        if(lives<=0){run=false;return end('rain',score,wrong,'Kana destruidos: '+hit)}
+      }
+    }
+    requestAnimationFrame(loop);
+  };
+  const kd=e=>{const b=o.querySelectorAll('button')[+e.key-1];b&&b.click()};
+  addEventListener('keydown',kd);
+  cleanup=()=>{run=false;removeEventListener('keydown',kd)};
+  up();add();requestAnimationFrame(loop);
+};
+
+GAMES.blitz=function(){
+  let score=0,combo=0,time=60,k,ok=0,wrong=[],lock=false;
+  $.innerHTML=hud+'<div class="bar"><i id="tb" style="width:100%"></i></div><div class="card" id="q"></div><div class="opts" id="o"></div>';
+  const q=Q('#q'),o=Q('#o');
+  const up=()=>{Q('#sc').textContent=score;Q('#lv').textContent='⏱ '+time+(combo>1?'  x'+combo:'');Q('#tb').style.width=time/60*100+'%'};
+  const ask=()=>{lock=false;k=pick();q.textContent=k.c;q.className='card';o.innerHTML=optsHtml(k);o.querySelectorAll('button').forEach(b=>b.onclick=()=>ans(b))};
+  const ans=b=>{
+    if(lock)return;lock=true;
+    if(b.dataset.r===k.r){combo++;ok++;score+=10+Math.min(combo,10)*3;b.classList.add('ok');q.classList.add('good');beep(600+combo*40,.07);setTimeout(ask,180)}
+    else{combo=0;fail(k);wrong.push(k);b.classList.add('no');[...o.children].find(x=>x.dataset.r===k.r).classList.add('ok');beep(150,.25,'sawtooth');time=Math.max(0,time-3);setTimeout(ask,900)}
+    up();
+  };
+  const iv=setInterval(()=>{time--;up();if(time<=0)end('blitz',score,wrong,'Aciertos: '+ok)},1000);
+  const kd=e=>{const b=o.querySelectorAll('button')[+e.key-1];b&&b.click()};
+  addEventListener('keydown',kd);
+  cleanup=()=>{clearInterval(iv);removeEventListener('keydown',kd)};
+  up();ask();
+};
+
+GAMES.mem=function(){
+  const ks=[],used=new Set();
+  for(const x of sh(pool()))if(!used.has(x.r)&&ks.length<6){used.add(x.r);ks.push(x)}
+  const cards=sh(ks.flatMap((x,i)=>[{i,t:x.c,kana:1},{i,t:x.r}]));
+  let open=[],moves=0,done=0,lock=false,wrong=[];
+  $.innerHTML=hud+`<div class="grid">${cards.map((c,j)=>`<button class="mc ${c.kana?'kn':''}" data-j="${j}"><span>${c.t}</span></button>`).join('')}</div><p class="hint">Une cada kana con su romaji</p>`;
+  const bs=$.querySelectorAll('.mc');
+  const up=()=>{Q('#sc').textContent=done+'/6';Q('#lv').textContent='Mov. '+moves};
+  bs.forEach((b,j)=>b.onclick=()=>{
+    if(lock||b.classList.contains('up')||b.classList.contains('done'))return;
+    b.classList.add('up');beep(500,.05);open.push(j);
+    if(open.length<2)return;
+    moves++;const [a,c]=open;open=[];
+    if(cards[a].i===cards[c].i){
+      done++;[a,c].forEach(x=>{bs[x].classList.remove('up');bs[x].classList.add('done')});beep(880,.15);up();
+      if(done===6)setTimeout(()=>end('mem',Math.max(100,1000-(moves-6)*50),wrong,'Movimientos: '+moves),500);
+    }else{
+      lock=true;[a,c].forEach(x=>{const k=ks[cards[x].i];fail(k);wrong.push(k)});beep(200,.15,'sawtooth');up();
+      setTimeout(()=>{[a,c].forEach(x=>bs[x].classList.remove('up'));lock=false},800);
+    }
+  });
+  up();
+};
+const AL={shi:['si'],chi:['ti'],tsu:['tu'],fu:['hu'],ji:['zi'],sha:['sya'],shu:['syu'],sho:['syo'],cha:['tya'],chu:['tyu'],cho:['tyo'],ja:['zya','jya'],ju:['zyu','jyu'],jo:['zyo','jyo']};
+GAMES.type=function(){
+  let score=0,combo=0,time=60,k,ok=0,wrong=[],lock=false;
+  $.innerHTML=hud+'<div class="bar"><i id="tb" style="width:100%"></i></div><div class="card" id="q"></div><input id="inp" class="inp" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="escribe el romaji"><p class="hint" id="h">Se acepta ‘si’, ‘ti’, ‘tu’, ‘hu’… además de shi, chi, tsu, fu.</p>';
+  const q=Q('#q'),inp=Q('#inp'),h=Q('#h');
+  const up=()=>{Q('#sc').textContent=score;Q('#lv').textContent='⏱ '+time+(combo>1?'  x'+combo:'');Q('#tb').style.width=time/60*100+'%'};
+  const good=v=>v===k.r||(AL[k.r]||[]).includes(v);
+  const ask=()=>{lock=false;k=pick();q.textContent=k.c;q.className='card';inp.value='';inp.focus()};
+  const send=()=>{
+    const v=inp.value.trim().toLowerCase();if(lock||!v)return;lock=true;
+    if(good(v)){combo++;ok++;score+=15+Math.min(combo,10)*3;q.classList.add('good');beep(600+combo*40,.07);setTimeout(ask,180)}
+    else{combo=0;fail(k);wrong.push(k);h.textContent='Era: '+k.r;beep(150,.25,'sawtooth');time=Math.max(0,time-3);setTimeout(ask,1000)}
+    up();
+  };
+  inp.oninput=()=>{if(!lock&&good(inp.value.trim().toLowerCase()))send()};
+  inp.onkeydown=e=>{if(e.key==='Enter')send()};
+  const iv=setInterval(()=>{time--;up();if(time<=0)end('type',score,wrong,'Aciertos: '+ok)},1000);
+  cleanup=()=>clearInterval(iv);
+  up();ask();
+};
+
+const WH=[['ねこ','neko','gato'],['いぬ','inu','perro'],['さかな','sakana','pescado'],['みず','mizu','agua'],['やま','yama','montaña'],['さくら','sakura','cerezo'],['ありがとう','arigatou','gracias'],['おはよう','ohayou','buenos días'],['ほし','hoshi','estrella'],['つき','tsuki','luna'],['かぜ','kaze','viento'],['はな','hana','flor'],['そら','sora','cielo'],['うみ','umi','mar'],['ともだち','tomodachi','amigo'],['くるま','kuruma','auto'],['たまご','tamago','huevo'],['ごはん','gohan','arroz'],['おちゃ','ocha','té'],['きょう','kyou','hoy'],['しゃしん','shashin','foto'],['ぼうし','boushi','sombrero']];
+const WK=[['コーヒー','koohii','café'],['ピザ','piza','pizza'],['テレビ','terebi','televisión'],['バナナ','banana','banana'],['ケーキ','keeki','pastel'],['ホテル','hoteru','hotel'],['ギター','gitaa','guitarra'],['パン','pan','pan'],['カメラ','kamera','cámara'],['アイス','aisu','helado'],['ラジオ','rajio','radio'],['ミルク','miruku','leche']];
+GAMES.words=function(){
+  const all=[...WH,...WK],ws=sh(mode=='h'?WH:mode=='k'?WK:all).slice(0,10);
+  let i=0,score=0,combo=0,ok=0,wrong=[],lock=false;
+  $.innerHTML=hud+'<div class="card w" id="q"></div><p class="hint" id="h"></p><div class="opts" id="o"></div>';
+  const q=Q('#q'),o=Q('#o'),h=Q('#h');
+  const up=()=>{Q('#sc').textContent=score;Q('#lv').textContent=Math.min(i+1,10)+'/10'+(combo>1?'  x'+combo:'')};
+  const ask=()=>{
+    if(i>=ws.length)return end('words',score,wrong,'Palabras acertadas: '+ok+'/'+ws.length);
+    lock=false;const w=ws[i];q.textContent=w[0];q.className='card w';h.textContent='¿Qué significa?';
+    const ms=sh([w[2],...sh(all.filter(x=>x[2]!==w[2])).slice(0,3).map(x=>x[2])]);
+    o.innerHTML=ms.map(m=>`<button class="btn" data-r="${m}">${m}</button>`).join('');
+    o.querySelectorAll('button').forEach(b=>b.onclick=()=>ans(b));up();
+  };
+  const ans=b=>{
+    if(lock)return;lock=true;const w=ws[i];
+    if(b.dataset.r===w[2]){combo++;ok++;score+=20+Math.min(combo,10)*5;b.classList.add('ok');q.classList.add('good');beep(700,.1)}
+    else{combo=0;wrong.push({c:w[0],r:w[1]+' = '+w[2]});b.classList.add('no');[...o.children].find(x=>x.dataset.r===w[2]).classList.add('ok');beep(150,.25,'sawtooth')}
+    h.textContent=w[1]+' = '+w[2];i++;up();setTimeout(ask,1200);
+  };
+  ask();
+};
+const rk=g=>g=='squiz'?g:g+mode+lk();
+const speak=t=>{try{const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}};
+const CH={s:'h',l:'b',hide:0};
+GAMES.chart=function(){
+  const {s,l,hide}=CH,b=D.b;
+  const cells=l=='b'?[...b.slice(0,35),b[35],null,b[36],null,b[37],...b.slice(38,43),b[43],null,null,null,b[44],b[45]]:D[l],n=l=='y'?3:5;
+  const kn=c=>s=='h'?c[0]:cv(c[0]);
+  $.innerHTML=`<div class=hud><button class=bk id=bk aria-label=Volver>◀</button><b>Tabla de kana</b><span></span></div>
+  <div class=seg>${[['h','Hiragana'],['k','Katakana']].map(([v,t])=>`<button class='${s==v?'on':''}' data-cs=${v}>${t}</button>`).join('')}</div>
+  <div class='seg lv'>${[['b','Básicos'],['d','Dakuten'],['y','Combinaciones']].map(([v,t])=>`<button class='${l==v?'on':''}' data-cl=${v}>${t}</button>`).join('')}</div>
+  <button class=snd id=hd>${hide?'👁 Mostrar romaji':'🙈 Ocultar romaji para repasar'}</button>
+  <div class=kg style='--n:${n};--ar:${n==3?'2/1':'1'}'>${cells.map(c=>c?`<button class='kc${hide?' hid':''}' data-k=${kn(c)}><b>${kn(c)}</b><small>${c[1]}</small></button>`:'<i></i>').join('')}</div>
+  <p class=hint>Toca un kana para escucharlo${hide?' y ver su romaji':''}. Cuando estés listo, vuelve al menú y elige un juego.</p>`;
+  Q('#bk').onclick=menu;
+  $.querySelectorAll('[data-cs]').forEach(x=>x.onclick=()=>{CH.s=x.dataset.cs;GAMES.chart()});
+  $.querySelectorAll('[data-cl]').forEach(x=>x.onclick=()=>{CH.l=x.dataset.cl;GAMES.chart()});
+  Q('#hd').onclick=()=>{CH.hide=hide?0:1;GAMES.chart()};
+  $.querySelectorAll('.kc').forEach(x=>x.onclick=()=>{x.classList.remove('hid');speak(x.dataset.k)});
+};
+
+const SS=[
+['Sailor Moon','セーラームーン','Seeraa Muun','月','tsuki','luna','月野うさぎ','Tsukino Usagi','campo de la luna','conejo','#ffd23f'],
+['Sailor Mercury','セーラーマーキュリー','Seeraa Maakyurii','水星','suisei','estrella de agua','水野亜美','Mizuno Ami','campo de agua','belleza','#4aa8ff'],
+['Sailor Mars','セーラーマーズ','Seeraa Maazu','火星','kasei','estrella de fuego','火野レイ','Hino Rei','campo de fuego','','#ff5c5c'],
+['Sailor Jupiter','セーラージュピター','Seeraa Jupitaa','木星','mokusei','estrella de madera','木野まこと','Kino Makoto','campo de árboles','sinceridad','#43e08a'],
+['Sailor Venus','セーラーヴィーナス','Seeraa Viinasu','金星','kinsei','estrella de oro','愛野美奈子','Aino Minako','campo de amor','niña hermosa','#ffa53d'],
+['Sailor Uranus','セーラーウラヌス','Seeraa Uranusu','天王星','tennousei','estrella del rey del cielo','天王はるか','Tenoh Haruka','rey del cielo','lejano','#d9b44a'],
+['Sailor Neptune','セーラーネプチューン','Seeraa Nepuchuun','海王星','kaiousei','estrella del rey del mar','海王みちる','Kaioh Michiru','rey del mar','plenitud','#2bc7c7'],
+['Sailor Pluto','セーラープルート','Seeraa Puruuto','冥王星','meiousei','estrella del rey del inframundo','冥王せつな','Meioh Setsuna','rey del inframundo','instante','#9b6bff'],
+['Sailor Saturn','セーラーサターン','Seeraa Sataan','土星','dosei','estrella de tierra','土萠ほたる','Tomoe Hotaru','brote de tierra','luciérnaga','#c58bff']];
+
+GAMES.sailor=function(){
+  $.innerHTML=`<div class=hud><button class=bk id=bk aria-label=Volver>◀</button><b>🌙 Sailor Scouts</b><span></span></div><p class=hint>Primero estudia las fichas y luego ponte a prueba.</p><div class=games><button class=cab id=st><i>📇</i><b>Estudiar fichas</b><small>Nombre en katakana, planeta en kanji y qué significa cada nombre.</small></button><button class=cab id=qz><i>🎯</i><b>Quiz Sailor</b><small>10 preguntas con explicación. Récord: ${S.best.squiz||0}</small></button></div>`;
+  Q('#bk').onclick=menu;Q('#st').onclick=()=>play('sstudy');Q('#qz').onclick=()=>play('squiz');
+};
+
+GAMES.sstudy=function(){
+  $.innerHTML=`<div class=hud><button class=bk id=bk aria-label=Volver>◀</button><b>Fichas</b><span></span></div>`+SS.map(s=>`<div class=sc style='--c:${s[10]}'><b>${s[3]}</b><div><strong>${s[0]}</strong><small>${s[1]} · ${s[2]}<br>Planeta: ${s[3]} (${s[4]}) = ${s[5]}<br>Civil: ${s[6]} (${s[7]})<br>Apellido: ${s[8]}${s[9]?' · Nombre: '+s[9]:''}</small></div></div>`).join('')+`<p class=hint>Nota: ヴィ se lee “vi”, como en Venus. 星 (sei) significa estrella.</p><button class=btn id=go style='width:100%'>¡A jugar el quiz!</button>`;
+  Q('#bk').onclick=()=>play('sailor');Q('#go').onclick=()=>play('squiz');
+};
+
+GAMES.squiz=function(){
+  const nm=SS.map(s=>s[0]);
+  const mk=(t,s)=>{
+    const [sn,fn]=s[7].split(' '),ex=`${s[0]}: ${s[6]} (${s[7]})`;
+    if(t==0)return{big:s[1],cl:'card s',ask:'¿De qué guerrera es este nombre?',a:s[0],p:nm,ex:`${s[1]} = ${s[2]}`};
+    if(t==1)return{big:s[3],cl:'card w',ask:'¿Qué guerrera protege este planeta?',a:s[0],p:nm,ex:`${s[3]} (${s[4]}) = ${s[5]}`};
+    if(t==2)return{big:s[5],cl:'card s',ask:'¿A qué guerrera pertenece este planeta?',a:s[0],p:nm,ex:`${s[3]} (${s[4]})`};
+    if(t==3)return{big:s[6].slice(0,2),cl:'card w',ask:`¿Qué significa el apellido ${sn}?`,a:s[8],p:SS.map(x=>x[8]),ex};
+    return{big:s[6].slice(2),cl:'card w',ask:`¿Qué significa el nombre ${fn}?`,a:s[9],p:SS.map(x=>x[9]).filter(Boolean),ex};
+  };
+  const qs=[...sh(SS),sh(SS)[0]].map(s=>mk(Math.random()*(s[9]?5:4)|0,s));
+  let i=0,score=0,combo=0,ok=0,wrong=[],lock=false;
+  $.innerHTML=hud+`<div class='card w' id=q></div><p class=hint id=h></p><div class=opts id=o></div>`;
+  const q=Q('#q'),o=Q('#o'),h=Q('#h');
+  const up=()=>{Q('#sc').textContent=score;Q('#lv').textContent=Math.min(i+1,10)+'/10'+(combo>1?'  x'+combo:'')};
+  const ask=()=>{
+    if(i>=qs.length)return end('squiz',score,wrong,'Aciertos: '+ok+'/'+qs.length);
+    lock=false;const x=qs[i];q.textContent=x.big;q.className=x.cl;h.textContent=x.ask;
+    const ms=sh([x.a,...sh([...new Set(x.p)].filter(v=>v!==x.a)).slice(0,3)]);
+    o.innerHTML=ms.map(m=>`<button class=btn data-r='${m}'>${m}</button>`).join('');
+    o.querySelectorAll('button').forEach(b=>b.onclick=()=>ans(b));up();
+  };
+  const ans=b=>{
+    if(lock)return;lock=true;const x=qs[i];
+    if(b.dataset.r===x.a){combo++;ok++;score+=20+Math.min(combo,10)*5;b.classList.add('ok');q.classList.add('good');beep(700,.1)}
+    else{combo=0;wrong.push({c:x.big,r:x.a});b.classList.add('no');[...o.children].find(y=>y.dataset.r===x.a).classList.add('ok');beep(150,.25,'sawtooth')}
+    h.textContent=x.ex;i++;up();setTimeout(ask,1600);
+  };
+  ask();
+};
+menu();
+</script>
+</body>
+</html>
